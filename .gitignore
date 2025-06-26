@@ -1,0 +1,9 @@
+PROJECT_ROADMAP.md
+.DS_Store
+.venv
+.vscode
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
