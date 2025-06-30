@@ -18,4 +18,18 @@ This project implements a scalable ML pipeline for classifying biomedical resear
 - Designed for Azure ML and AKS, but can be adapted to AWS or GCP.
 
 ## Disclaimer
-This project uses data from NCBI PubMed via the Entrez API. Please review the [NCBI Disclaimer and Copyright notice](https://www.ncbi.nlm.nih.gov/About/disclaimer.html) before using or redistributing any data. Abstracts in PubMed may be protected by copyright. All users are expected to adhere to the terms and conditions asserted by the copyright holder. This project is for research and educational purposes only. 
+This project uses data from NCBI PubMed via the Entrez API. Please review the [NCBI Disclaimer and Copyright notice](https://www.ncbi.nlm.nih.gov/About/disclaimer.html) before using or redistributing any data. Abstracts in PubMed may be protected by copyright. All users are expected to adhere to the terms and conditions asserted by the copyright holder. This project is for research and educational purposes only.
+
+## Project Logic & Data Flow
+
+- **Entity Extraction (NER):**
+  - Use the original abstracts for named entity recognition (NER) and category extraction.
+  - Cleaning (lemmatization, stopword removal) can remove important context and harm NER performance.
+- **Modeling/Classification:**
+  - Use the cleaned abstracts (lowercased, lemmatized, stopwords removed) for feature engineering and as input to ML models.
+- **Conclusion:**
+  - **Keep both versions:**
+    - Use the original abstracts for NER/category extraction.
+    - Use the cleaned abstracts for modeling/classification.
+
+This approach ensures optimal performance for both entity extraction and downstream machine learning tasks. 

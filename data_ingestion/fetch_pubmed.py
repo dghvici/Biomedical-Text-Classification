@@ -11,6 +11,7 @@ TOOL_NAME = 'BioTextClassifier'
 SEARCH_TERM = 'neurological disorders OR behavioral disorders'
 MAX_COUNT = 1000
 BATCH_SIZE = 100
+SUPPLEMENT_MARGIN = 50  # Extra articles to fetch in case of NaN values
 
 
 def fetch_pubmed_ids(term, max_count):
@@ -55,21 +56,68 @@ def parse_article(article):
     }
 
 
-def main():
-    print(f"Fetching up to {MAX_COUNT} PubMed abstracts for: {SEARCH_TERM}")
-    ids = fetch_pubmed_ids(SEARCH_TERM, MAX_COUNT)
+def fetch_with_supplementation(term, target_count):
+    """Fetch articles with supplementation to handle NaN abstracts"""
+    print(f"Fetching up to {target_count + SUPPLEMENT_MARGIN} PubMed abstracts for: {term}")
+    
+    # Fetch initial batch with extra margin
+    ids = fetch_pubmed_ids(term, target_count + SUPPLEMENT_MARGIN)
     print(f"Found {len(ids)} articles.")
+    
     all_articles = []
+    valid_articles = 0
+    
     for start in range(0, len(ids), BATCH_SIZE):
         batch_ids = ids[start:start+BATCH_SIZE]
         print(f"Fetching details for records {start+1} to {start+len(batch_ids)}...")
         articles = fetch_details(batch_ids)
+        
         for article in articles:
-            all_articles.append(parse_article(article))
+            parsed_article = parse_article(article)
+            all_articles.append(parsed_article)
+            
+            # Count valid articles (those with abstracts)
+            if parsed_article['Abstract'] and parsed_article['Abstract'].strip():
+                valid_articles += 1
+                
+                # If we have enough valid articles, we can stop
+                if valid_articles >= target_count:
+                    print(f"Reached target of {target_count} valid articles. Stopping fetch.")
+                    break
+        
         time.sleep(0.5)  # Be polite to NCBI servers
+        
+        # Check if we have enough valid articles
+        if valid_articles >= target_count:
+            break
+    
+    # Filter to keep only articles with valid abstracts
+    valid_articles_list = [article for article in all_articles if article['Abstract'] and article['Abstract'].strip()]
+    
+    print(f"Fetched {len(all_articles)} total articles")
+    print(f"Found {len(valid_articles_list)} articles with valid abstracts")
+    
+    # If we still don't have enough, try to fetch more
+    if len(valid_articles_list) < target_count:
+        print(f"Warning: Only found {len(valid_articles_list)} valid articles out of {target_count} requested")
+    
+    return valid_articles_list[:target_count]
+
+
+def main():
+    # Fetch articles with supplementation
+    all_articles = fetch_with_supplementation(SEARCH_TERM, MAX_COUNT)
+    
     df = pd.DataFrame(all_articles)
     df.to_csv('data_ingestion/pubmed_abstracts.csv', index=False)
     print(f"Saved {len(df)} abstracts to data_ingestion/pubmed_abstracts.csv")
+    
+    # Verify no NaN abstracts
+    nan_count = df['Abstract'].isna().sum()
+    if nan_count > 0:
+        print(f"Warning: Still found {nan_count} articles with NaN abstracts")
+    else:
+        print("Success: All articles have valid abstracts!")
 
 
 if __name__ == '__main__':
