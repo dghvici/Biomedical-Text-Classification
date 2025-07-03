@@ -1,6 +1,6 @@
 PROJECT_ROADMAP.md
 .DS_Store
-.venv
+venv/
 .vscode
 .env
 .env.local

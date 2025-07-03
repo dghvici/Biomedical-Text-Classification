@@ -1,5 +1,10 @@
 biopython
 pandas
-tensorflow
 scikit-learn
-spacy 
+tensorflow
+spacy
+scispacy
+matplotlib
+seaborn
+# scispaCy NER model (install manually, not via pip):
+# pip install https://github.com/allenai/scispacy-models/releases/download/en_ner_bc5cdr_md-0.5.1/en_ner_bc5cdr_md-0.5.1.tar.gz 

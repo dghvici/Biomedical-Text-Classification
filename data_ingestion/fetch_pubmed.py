@@ -8,8 +8,17 @@ Entrez.email = os.environ.get('ENTREZ_EMAIL', 'your_email@example.com')  # Repla
 TOOL_NAME = 'BioTextClassifier'
 
 # Search parameters
-SEARCH_TERM = 'neurological disorders OR behavioral disorders'
-MAX_COUNT = 1000
+SEARCH_TERM = (
+    '((neurological disorder OR neurological disease OR behavioral disorder OR behavioral disease) '
+    'AND ("Phase II" OR "efficacy of" OR "therapeutic impact" OR "clinical response" OR '
+    '"treatment outcome" OR "drug therapy" OR "side effects" OR "mechanism of action")) '
+    'AND ("Therapeutic Uses"[MeSH Terms] OR "Drug Therapy"[MeSH Terms] OR "Treatment Outcome"[MeSH Terms]) '
+    'AND (journal:"Nature Reviews Neuroscience" OR journal:"Neuron" OR journal:"Annual Review of Neuroscience" '
+    'OR journal:"Trends in Neurosciences" OR journal:"Nature Neuroscience" OR journal:"Brain" '
+    'OR journal:"Molecular Psychiatry" OR journal:"Biological Psychiatry" OR journal:"Progress in Neurobiology" '
+    'OR journal:"Neuropsychopharmacology")'
+)
+MAX_COUNT = 2000
 BATCH_SIZE = 100
 SUPPLEMENT_MARGIN = 50  # Extra articles to fetch in case of NaN values
 
