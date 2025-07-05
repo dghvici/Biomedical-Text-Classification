@@ -7,3 +7,10 @@ venv/
 .env.development.local
 .env.test.local
 .env.production.local
+*.pkl
+*.csv
+./*csv
+models/*.joblib
+models/*.pth
+models/*.pt
+models/*.pkl
